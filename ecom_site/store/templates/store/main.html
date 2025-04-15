@@ -38,7 +38,7 @@
             <a href="{% url 'cart' %}">
                 <img id="cart-icon" src="{% static 'images/cart.png' %}">
             </a>
-            <p id="cart-total">0</p>
+            <p id="cart-total">{{ order.get_cart_items }}</p>
         </div>
     </div>
 </nav>
@@ -84,6 +84,68 @@
           });
       });
   </script>
+
+
+  <script>
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const itemId = this.getAttribute('data-item-id');
+            const url = '/delete_item/';  // URL for the delete item view
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token
+                },
+                body: JSON.stringify({ itemId: itemId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);  // Show a success message
+                location.reload();  // Reload the page to update the cart
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+
+
+
+<script>
+  const quantityButtons = document.querySelectorAll('.chg-quantity');
+
+  // Handle increment and decrement
+  quantityButtons.forEach(button => {
+      button.addEventListener('click', function () {
+          const itemId = this.getAttribute('data-item-id'); // Get the item ID
+          const action = this.getAttribute('data-action'); // Get the action (increment or decrement)
+          const url = '/update_item/';  // URL for updating item quantity
+
+          fetch(url, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token
+              },
+              body: JSON.stringify({ itemId: itemId, action: action }) // Send item ID and action
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  location.reload(); // Reload the page to reflect changes
+              } else {
+                  alert(data.message); // Show an error message if needed
+              }
+          })
+          .catch(error => console.error('Error:', error));
+      });
+  });
+</script>
+
+
 
 </body>
 </html>
