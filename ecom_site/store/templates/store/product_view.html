@@ -1,10 +1,33 @@
-{% extends 'store/Main.html' %}
+{% extends 'store/main.html' %}
 {% block content %}
-<div class="product-detail">
     <h2>{{ product.name }}</h2>
-    <img src="{{ product.image.url }}" alt="{{ product.name }}">
-    <p>Price: ${{ product.price }}</p>
-    <p>Description: {{ product.description }}</p>
-    <button class="btn btn-outline-secondary add-btn" data-product-id="{{ product.id }}">Add to Cart</button>
-</div>
+    <img src="{{ product.imageURL }}" alt="{{ product.name }}" style="width: 300px; height: auto;">
+    <p><strong>Price:</strong> ${{ product.price }}</p>
+    <p><strong>Category:</strong> {{ product.category.name }}</p>
+
+    <hr>
+
+    <h3>Customer Reviews</h3>
+    {% for review in reviews %}
+        <div class="review">
+            <p><strong>{{ review.user.username }}</strong> ({{ review.rating }}/5)</p>
+            <p>{{ review.comment }}</p>
+            <p><small>{{ review.date_added }}</small></p>
+        </div>
+        <hr>
+    {% empty %}
+        <p>No reviews yet. Be the first to review this product!</p>
+    {% endfor %}
+
+    {% if has_purchased %}
+        <hr>
+        <h3>Leave a Review</h3>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+        </form>
+    {% else %}
+        <p class="text-danger">You must purchase this product to leave a review.</p>
+    {% endif %}
 {% endblock content %}

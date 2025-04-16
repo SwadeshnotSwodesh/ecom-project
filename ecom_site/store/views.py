@@ -6,7 +6,9 @@ from django.contrib.auth import login
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 import datetime
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from .forms import ReviewForm
 from .models import * 
 
 
@@ -162,7 +164,8 @@ def processOrder(request):
 @login_required
 def my_orders(request):
     customer = request.user.customer
-    orders = Order.objects.filter(customer=customer, complete=True).order_by('-date_ordered')  # Completed orders
+    timezone.activate(customer.timezone)  # Activate the user's time zone
+    orders = Order.objects.filter(customer=customer, complete=True).order_by('-date_ordered')
     context = {'orders': orders}
     return render(request, 'store/my_orders.html', context)
 
@@ -172,5 +175,49 @@ def order_details(request, order_id):
     customer = request.user.customer
     order = get_object_or_404(Order, id=order_id, customer=customer, complete=True)
     items = order.orderitem_set.all()
-    context = {'order': order, 'items': items}
+    context = {
+        'order': order,
+        'items': items,
+        'date_ordered_utc': order.date_ordered.isoformat(),  # Pass UTC time to the template
+    }
     return render(request, 'store/order_details.html', context)
+
+
+
+@login_required
+def product_details(request, id):
+    # Get the product or return 404
+    product = get_object_or_404(Product, id=id)
+
+    # Get all associated reviews
+    reviews = product.reviews.all()
+
+    # Check if the user has purchased this product
+    has_purchased = OrderItem.objects.filter(order__customer=request.user.customer, product=product, order__complete=True).exists()
+
+    # Initialize an empty form
+    form = ReviewForm()
+
+    # Handle form submission
+    if request.method == 'POST' and has_purchased:
+        form = ReviewForm(data=request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = product
+            review.user = request.user
+            review.save()
+            return redirect('product_details', id=id)
+
+    # Context for the template
+    context = {
+        'product': product,
+        'form': form,
+        'reviews': reviews,
+        'has_purchased': has_purchased,
+    }
+
+    return render(request, 'store/product_details.html', context)
+
+
+
+

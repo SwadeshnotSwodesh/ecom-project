@@ -16,7 +16,8 @@
                 {% for order in orders %}
                 <tr>
                     <td>{{ order.id }}</td>
-                    <td>{{ order.date_ordered }}</td>
+                    <!-- Add a data-utc attribute to store the UTC time -->
+                    <td class="order-time" data-utc="{{ order.date_ordered|date:'c' }}"></td>
                     <td>{{ order.get_cart_items }}</td>
                     <td>${{ order.get_cart_total }}</td>
                     <td>
@@ -29,4 +30,16 @@
     {% else %}
         <p>You have no completed orders.</p>
     {% endif %}
+
+    <!-- JavaScript to convert UTC time to local time -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const timeElements = document.querySelectorAll('.order-time');  // Select elements with the class 'order-time'
+            timeElements.forEach(element => {
+                const utcTime = element.getAttribute('data-utc');  // Get the UTC time from the data-utc attribute
+                const localTime = new Date(utcTime).toLocaleString();  // Convert to local time
+                element.textContent = localTime;  // Update the element's content with the local time
+            });
+        });
+    </script>
 {% endblock content %}

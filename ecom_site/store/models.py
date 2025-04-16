@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.timezone import get_current_timezone_name
 
 @receiver(post_save, sender=User)
 def create_customer(sender, instance, created, **kwargs):
@@ -21,12 +22,13 @@ class Category(models.Model):
 
 
 class Customer(models.Model):
-	user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
-	name = models.CharField(max_length=200, null=True)
-	email = models.CharField(max_length=200)
+    user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200, null=True)
+    email = models.CharField(max_length=200)
+    timezone = models.CharField(max_length=50, default=get_current_timezone_name)  # Add this field
 
-	def __str__(self):
-		return self.name
+    def __str__(self):
+        return self.name
 	
 
 class Product(models.Model):
@@ -119,3 +121,15 @@ def checkout(request):
 
 	context = {'items':items, 'order':order, 'cartItems':cartItems}
 	return render(request, 'store/checkout.html', context)
+
+
+
+class Review(models.Model):
+    product = models.ForeignKey('Product', related_name='reviews', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  # Rating from 1 to 5
+    comment = models.TextField()
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+         return f"{self.user.username} - {self.product.name} ({self.rating}/5)"
