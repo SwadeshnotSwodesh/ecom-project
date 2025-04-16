@@ -6,8 +6,8 @@
         <div class="col-lg-6">
             <div class="box-element">
                 <form id="form" method="POST">
+                    {% csrf_token %}
                     <div class="row">
-                        <!-- Name and Email -->
                         <div class="col-md-6">
                             <input type="text" id="name" class="form-control" placeholder="Name.." required>
                         </div>
@@ -15,11 +15,9 @@
                             <input type="email" id="email" class="form-control" placeholder="Email.." required>
                         </div>
                     </div>
-
+                
                     <br>
-
-                    <!-- Shipping Information -->
-                    <h5>Shipping Information:</h5>
+                
                     <div class="row">
                         <div class="col-md-6">
                             <input type="text" id="address" class="form-control" placeholder="Address.." required>
@@ -28,7 +26,9 @@
                             <input type="text" id="city" class="form-control" placeholder="City.." required>
                         </div>
                     </div>
+                
                     <br>
+                
                     <div class="row">
                         <div class="col-md-6">
                             <input type="text" id="state" class="form-control" placeholder="State.." required>
@@ -37,10 +37,9 @@
                             <input type="text" id="zipcode" class="form-control" placeholder="Zip code.." required>
                         </div>
                     </div>
-
+                
                     <br>
-
-                    <!-- Submit Button -->
+                
                     <button type="submit" class="btn btn-success btn-block">Continue</button>
                 </form>
             </div>
@@ -81,12 +80,13 @@
         </div>
     </div>
 
+     
     <script>
         const form = document.getElementById('form');
-
+    
         form.addEventListener('submit', function (e) {
             e.preventDefault();
-
+    
             const shippingInfo = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
@@ -95,9 +95,9 @@
                 state: document.getElementById('state').value,
                 zipcode: document.getElementById('zipcode').value,
             };
-
+    
             const url = '/process_order/';
-
+    
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -120,4 +120,5 @@
             .catch(error => console.error('Error:', error));
         });
     </script>
+
 {% endblock content %}

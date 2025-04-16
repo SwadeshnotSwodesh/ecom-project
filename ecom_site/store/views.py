@@ -6,6 +6,7 @@ from django.contrib.auth import login
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 import datetime
+from django.contrib.auth.decorators import login_required
 from .models import * 
 
 
@@ -125,6 +126,8 @@ def update_item(request):
     return JsonResponse({'success': False, 'message': 'Invalid request method.'}, safe=False)
 
 
+
+
 def processOrder(request):
     transaction_id = datetime.datetime.now().timestamp()
     data = json.loads(request.body)
@@ -152,3 +155,22 @@ def processOrder(request):
         print('User is not logged in')
 
     return JsonResponse('Payment submitted..', safe=False)
+ 
+
+
+
+@login_required
+def my_orders(request):
+    customer = request.user.customer
+    orders = Order.objects.filter(customer=customer, complete=True).order_by('-date_ordered')  # Completed orders
+    context = {'orders': orders}
+    return render(request, 'store/my_orders.html', context)
+
+
+@login_required
+def order_details(request, order_id):
+    customer = request.user.customer
+    order = get_object_or_404(Order, id=order_id, customer=customer, complete=True)
+    items = order.orderitem_set.all()
+    context = {'order': order, 'items': items}
+    return render(request, 'store/order_details.html', context)

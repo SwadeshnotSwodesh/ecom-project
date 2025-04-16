@@ -22,6 +22,11 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'store' %}">Store <span class="sr-only">(current)</span></a>
             </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'my_orders' %}">My Orders</a> <!-- Add this line -->
+            </li>
+
         </ul>
         <div class="form-inline my-2 my-lg-0">
             {% if user.is_authenticated %}

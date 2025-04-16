@@ -1,0 +1,30 @@
+{% extends 'store/main.html' %}
+{% block content %}
+    <h2>Order Details</h2>
+    <p><strong>Order ID:</strong> {{ order.id }}</p>
+    <p><strong>Date Ordered:</strong> {{ order.date_ordered }}</p>
+    <p><strong>Total Items:</strong> {{ order.get_cart_items }}</p>
+    <p><strong>Total Price:</strong> ${{ order.get_cart_total }}</p>
+
+    <h3>Items</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.product.price }}</td>
+                <td>${{ item.get_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
