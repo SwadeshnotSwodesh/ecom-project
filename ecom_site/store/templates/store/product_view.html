@@ -5,6 +5,16 @@
     <p><strong>Price:</strong> ${{ product.price }}</p>
     <p><strong>Category:</strong> {{ product.category.name }}</p>
 
+    <!-- Wishlist Button -->
+    {% if in_wishlist %}
+        <a href="{% url 'remove_from_wishlist' product.id %}" class="btn btn-danger">Remove from Wishlist</a>
+    {% else %}
+        <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-success">Add to Wishlist</a>
+    {% endif %}
+
+    <!-- Add to Cart Button -->
+    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary">Add to Cart</a>
+
     <hr>
 
     <h3>Customer Reviews</h3>

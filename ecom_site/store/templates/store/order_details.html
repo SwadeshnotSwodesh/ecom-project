@@ -1,15 +1,15 @@
 {% extends 'store/main.html' %}
+{% load static %}
 {% block content %}
     <h2>Order Details</h2>
     <p><strong>Order ID:</strong> {{ order.id }}</p>
-    <p><strong>Date Ordered:</strong> <span id="date-ordered">{{ date_ordered_utc }}</span></p>
-    <p><strong>Total Items:</strong> {{ order.get_cart_items }}</p>
-    <p><strong>Total Price:</strong> ${{ order.get_cart_total }}</p>
+    <p><strong>Date Ordered:</strong> {{ order.date_ordered }}</p>
+    <p><strong>Total:</strong> ${{ order.get_cart_total }}</p>
 
-    <h3>Items</h3>
     <table class="table">
         <thead>
             <tr>
+                <th>Image</th> <!-- New column for the image -->
                 <th>Product</th>
                 <th>Quantity</th>
                 <th>Price</th>
@@ -19,6 +19,13 @@
         <tbody>
             {% for item in items %}
             <tr>
+                <td>
+                    {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 100px; height: auto;">
+                    {% else %}
+                        <img src="{% static 'store/images/default.jpg' %}" alt="Default Image" style="width: 100px; height: auto;">
+                    {% endif %}
+                </td>
                 <td>{{ item.product.name }}</td>
                 <td>{{ item.quantity }}</td>
                 <td>${{ item.product.price }}</td>

@@ -221,3 +221,47 @@ def product_details(request, id):
 
 
 
+
+@login_required
+def product_view(request, id):
+    product = get_object_or_404(Product, id=id)
+
+    # Check if the product is in the user's wishlist
+    in_wishlist = Wishlist.objects.filter(user=request.user, product=product).exists()
+
+    context = {
+        'product': product,
+        'in_wishlist': in_wishlist,  # Pass the wishlist status to the template
+    }
+    return render(request, 'store/product_view.html', context)
+
+
+
+@login_required
+def add_to_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Wishlist.objects.get_or_create(user=request.user, product=product)
+    return redirect('wishlist')  # Redirect to the wishlist page
+
+@login_required
+def remove_from_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Wishlist.objects.filter(user=request.user, product=product).delete()
+    return redirect('wishlist')  # Redirect to the wishlist page
+
+@login_required
+def wishlist(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    context = {'wishlist_items': wishlist_items}
+    return render(request, 'store/wishlist.html', context)
+
+@login_required
+def add_to_cart_from_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    customer = request.user.customer
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
+    order_item, created = OrderItem.objects.get_or_create(order=order, product=product)
+    order_item.quantity += 1
+    order_item.save()
+    Wishlist.objects.filter(user=request.user, product=product).delete()  # Remove from wishlist after adding to cart
+    return redirect('cart')  # Redirect to the cart page

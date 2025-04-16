@@ -14,6 +14,14 @@
                 <hr>
                 <button class="btn btn-outline-secondary add-btn" data-product-id="{{ product.id }}">Add to Cart</button>
                 <a class="btn btn-outline-success" href="{% url 'product_view' product.id %}">View</a>
+                
+                <!-- Wishlist Button -->
+                {% if product.id in wishlist_items %}
+                    <span class="btn btn-secondary disabled">In Wishlist</span>
+                {% else %}
+                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-warning">&lt;3</a>
+                {% endif %}
+                
                 <h4 style="display: inline-block; float: right"><strong>${{ product.price }}</strong></h4>
             </div>
         </div>
